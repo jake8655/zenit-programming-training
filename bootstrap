@@ -1,0 +1,82 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+BASE="zenit24sk"
+
+# Find highest‐letter suffix among existing zenit24sk? dirs
+max_code=0
+shopt -s nullglob
+for dir in "${BASE}"?; do
+  [[ -d $dir ]] || continue
+  suffix=${dir: -1}
+  # ascii code of suffix
+  code=$(printf '%d' "'$suffix")
+  (( code > max_code )) && max_code=$code
+done
+
+# Determine next letter
+if (( max_code == 0 )); then
+  next_letter="a"
+else
+  next_code=$(( max_code + 1 ))
+  # convert decimal -> octal escape -> character
+  next_letter=$(printf "\\$(printf '%03o' "$next_code")")
+fi
+
+proj="${BASE}${next_letter}"
+
+# Double‐check we’re not overwriting anything unexpected
+if [[ -e $proj ]]; then
+  echo "Error: target '$proj' already exists." >&2
+  exit 1
+fi
+
+# Bootstrap the Cargo project
+cargo init --vcs none --bin "$proj"
+cd "$proj"
+
+# Write your template into src/main.rs
+cat > src/main.rs << 'EOF'
+use std::{
+    env, fs,
+    io::{BufRead, stdin},
+};
+
+fn solve(input: Vec<String>) -> i32 {
+    10
+}
+
+fn main() {
+    let mut args = env::args().skip(1);
+    let input = if let Some(arg) = args.next() {
+        match arg.as_str() {
+            "--file" => {
+                let contents = fs::read_to_string("./input").unwrap_or_else(|e| {
+                    eprintln!("Failed to read input file: {}", e);
+                    std::process::exit(1);
+                });
+                let lines: Vec<String> = contents.lines().map(|s| s.to_string()).collect();
+                lines
+            }
+            _ => stdin_lines(),
+        }
+    } else {
+        stdin_lines()
+    };
+
+    let result = solve(input);
+    println!("{}", result);
+}
+
+fn stdin_lines() -> Vec<String> {
+    let lock = stdin().lock();
+    let lines = lock.lines().collect::<Result<_, _>>();
+    match lines {
+        Ok(lines) => lines,
+        Err(_) => panic!("Failed to read lines from stdin"),
+    }
+}
+EOF
+
+touch input
+echo "✔ Initialized project '$proj'"
