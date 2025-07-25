@@ -7,3 +7,6 @@ This repo is for me to train zenit programming tasks.
 | zenit24ska | OK | 12 |
 | zenit24skb | OK | 15 |
 | zenit24skc | OK | 20 |
+| zenit24skd | OK | 24 |
+
+Total: 71 points

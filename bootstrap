@@ -69,7 +69,8 @@ fn main() {
 }
 
 fn stdin_lines() -> Vec<String> {
-    let lock = stdin().lock();
+    let sin = stdin();
+    let lock = sin.lock();
     let lines = lock.lines().collect::<Result<_, _>>();
     match lines {
         Ok(lines) => lines,
