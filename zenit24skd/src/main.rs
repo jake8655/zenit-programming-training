@@ -14,31 +14,26 @@ fn solve(input: Vec<String>) -> &'static str {
         })
         .collect::<Vec<Vec<_>>>();
 
-    let first_row = &input_numbers[0];
+    let n = input_numbers.len();
+    let mut diagonal = vec![None; 2 * n - 1];
+    for i in 0..n {
+        for j in 0..n {
+            let index = (i as isize - j as isize + (n as isize - 1)) as usize;
 
-    for i in 0..first_row.len() - 1 {
-        let current = first_row[i];
-        let mut row = 1;
-        for j in i + 1..input_numbers.len() {
-            if input_numbers[row][j] != current {
-                return "kopa smetia";
+            match diagonal[index] {
+                None => {
+                    diagonal[index] = Some(input_numbers[i][j]);
+                }
+                Some(v) => {
+                    if v != input_numbers[i][j] {
+                        return "kopa smetia";
+                    }
+                }
             }
-            row += 1;
         }
     }
 
-    for i in 1..input_numbers.len() - 1 {
-        let current = input_numbers[i][0];
-        let mut row = 1;
-        for j in i + 1..input_numbers.len() {
-            if input_numbers[j][row] != current {
-                return "kopa smetia";
-            }
-            row += 1;
-        }
-    }
-
-    "dokonale diagonalne"
+    return "dokonale diagonalne";
 }
 
 fn main() {
